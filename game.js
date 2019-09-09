@@ -31,6 +31,4 @@ var y;
 var bullets;
 var speed;
 var lastFired = 0;
-var ship1;
-var ship2;
-var ship3;
+
