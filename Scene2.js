@@ -1,3 +1,4 @@
+
 class Scene2 extends Phaser.Scene {
   constructor() {
     super("playGame");
@@ -8,9 +9,9 @@ class Scene2 extends Phaser.Scene {
     this.background = this.add.tileSprite(0, 0, config.width, config.height, "background");
     this.background.setOrigin(0, 0);
 
-    this.ship1 = this.add.sprite(config.width / 2 - 50, config.height / 2, "ship").setScale(2);
-    this.ship2 = this.add.sprite(config.width / 2, config.height / 2, "ship2").setScale(2);
-    this.ship3 = this.add.sprite(config.width / 2 + 50, config.height / 2, "ship3").setScale(2);
+    ship1 = this.add.sprite(config.width / 2 - 50, config.height / 2, "ship").setScale(2);
+    ship2 = this.add.sprite(config.width / 2, config.height / 2, "ship2").setScale(2);
+    ship3 = this.add.sprite(config.width / 2 + 50, config.height / 2, "ship3").setScale(2);
 
     this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 64, "player").setScale(3);
 
@@ -91,35 +92,6 @@ class Scene2 extends Phaser.Scene {
       framerate: 20,
       repeat: -1
     });
-
-
-
-
-
-
-    this.ship1.play("ship1_anim");
-    this.ship2.play("ship2_anim");
-    this.ship3.play("ship3_anim");
-
-    this.player.play("thrust");
-
-
-
-    this.ship1.setInteractive();
-    this.ship2.setInteractive();
-    this.ship3.setInteractive();
-
-
-    this.input.on('gameobjectdown', this.destroyShip, this);
-
-    txtScore = this.add.text(0, 0, "S C O R E  " + score, {
-      font: "25px Arial",
-      fill: "yellow"
-    });
-
-    // POWER UPS
-
-    //Two Animations for the power ups
     this.anims.create({
       key: "red",
       frames: this.anims.generateFrameNumbers("power-up", {
@@ -139,10 +111,36 @@ class Scene2 extends Phaser.Scene {
       repeat: -1
     });
 
-    // 3.1
+
+
+
+
+    ship1.play("ship1_anim");
+    ship2.play("ship2_anim");
+    ship3.play("ship3_anim");
+
+    this.player.play("thrust");
+
+
+
+    ship1.setInteractive();
+    ship2.setInteractive();
+    ship3.setInteractive();
+
+
+    this.input.on('gameobjectdown', this.destroyShip, this);
+
+    txtScore = this.add.text(0, 0, "S C O R E  " + score, {
+      font: "25px Arial",
+      fill: "yellow"
+    });
+
+
     this.physics.world.setBoundsCollision();
 
     this.powerUps = this.physics.add.group();
+    
+   
 
     // 2.2 Add multiple objects
     var maxObjects = 4;
@@ -168,17 +166,28 @@ class Scene2 extends Phaser.Scene {
     }
 
     cursor = this.input.keyboard.createCursorKeys();
-    
-    if (Phaser.Input.Keyboard.JustDown(this.keySpace)){
+
+    if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
       console.log("fire");
     }
+    
+
+     this.physics.add.collider(this.powerUps, this.player, this.destroyPlayer, null, this);
+    
+    /*this.enemies = this.physycs.add.group();
+    this.enimies.add(ship1)
+    this.enimies.add(ship2)
+    this.enimies.add(ship3)*/ 
+
+    // console.log(bullets);
 
   }
-
+  
+  
   update(time) {
-    this.moveShip(this.ship1, nave1);
-    this.moveShip(this.ship2, nave2);
-    this.moveShip(this.ship3, nave3);
+    this.moveShip(ship1, nave1);
+    this.moveShip(ship2, nave2);
+    this.moveShip(ship3, nave3);
     /*if(score ==2){
       nave1 = nave1 +0.001;
       
@@ -200,6 +209,7 @@ class Scene2 extends Phaser.Scene {
 
 
   }
+  
 
   movePlayerManeger() {
     if (cursor.left.isDown) {
@@ -237,5 +247,10 @@ class Scene2 extends Phaser.Scene {
     gameObject.play("explode");
   }
 
+  destroyPlayer(gameObject) {
+    
+    gameObject.setTexture("explosion");
+    gameObject.play("explode");
+  }
 
 }
