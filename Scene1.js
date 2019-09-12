@@ -8,6 +8,7 @@ class Scene1 extends Phaser.Scene {
     this.load.audio("sound", "assets/sound/8bit.mp3");
 
     this.load.image('start', 'assets/images/start.png');
+    this.load.image('heart', 'assets/images/heart.png');
 
     this.load.spritesheet("ship", "assets/spritesheets/ship.png", {
       frameWidth: 16,
@@ -47,7 +48,7 @@ class Scene1 extends Phaser.Scene {
     start = this.add.tileSprite(0, 0, config.width, config.height, "start");
     start.setOrigin(0, 0);
 
-    txtTitle = this.add.text(this.physics.world.bounds.centerX - 150, 250, 'Dodge and Shoot', { font: '40px', fill: '#fff' });
+    //txtTitle = this.add.text(this.physics.world.bounds.centerX - 150, 250, 'Dodge and Shoot', { font: '40px', fill: '#fff' });
     txtPressStart = this.add.text(this.physics.world.bounds.centerX - 50, 600,
       'PRESS START', { font: '20px', fill: '#fff' });
 
@@ -56,7 +57,7 @@ class Scene1 extends Phaser.Scene {
       targets: txtPressStart,
       ease: 'Power1',
       duration: 1000,
-      tweens: [{ y: 350 }]
+      tweens: [{ y: 500 }]
     });
 
     this.time.addEvent({
@@ -65,7 +66,6 @@ class Scene1 extends Phaser.Scene {
         keyENTER = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         keyENTER.on('down', startGame, this);
       },
-      //args: [],
       callbackScope: this,
       loop: false
     });

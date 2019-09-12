@@ -4,7 +4,7 @@ var config = {
   backgroundColor: 0x000000,
   scene: [Scene1, Scene2],
   pixelArt: true,
-  // 1.1 set the physics to arcade
+  //set the physics to arcade
   physics: {
     default: "arcade",
     arcade: {
@@ -12,7 +12,6 @@ var config = {
     }
   }
 }
-
 var game = new Phaser.Game(config);
 var start;
 var txtTitle;
@@ -25,10 +24,16 @@ var nave1 = 5;
 var nave2 = 6;
 var nave3 = 7;
 var cursor;
-var playerSpeed = 200;
+var playerSpeed = 400;
 var x;
 var y;
 var bullets;
 var speed;
 var lastFired = 0;
-
+var lifeObj = [];
+var life = 5;
+var position = 30;
+var endGame = false;
+var gameSettings = {
+  playerSpeed: 400,
+}
