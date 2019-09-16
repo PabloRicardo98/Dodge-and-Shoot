@@ -2,7 +2,9 @@ class Scene1 extends Phaser.Scene {
   constructor() {
     super("bootGame");
   }
-
+  //--------------------------------
+  // carregamento de imagens        
+  //--------------------------------
   preload() {
     this.load.image("background", "assets/images/background.png");
     this.load.audio("sound", "assets/sound/8bit.mp3");
@@ -39,8 +41,8 @@ class Scene1 extends Phaser.Scene {
       frameHeight: 12
     });
   }
-
   create() {
+    //Audio do game tela incial
     sound = this.sound.add('sound');
     sound.loop = true;
     sound.play();
@@ -59,7 +61,6 @@ class Scene1 extends Phaser.Scene {
       duration: 1000,
       tweens: [{ y: 500 }]
     });
-
     this.time.addEvent({
       delay: 1000,
       callback: function () {
@@ -70,7 +71,6 @@ class Scene1 extends Phaser.Scene {
       loop: false
     });
   }
-
 }
 function startGame() {
   sound.stop();

@@ -12,6 +12,7 @@ var config = {
     }
   }
 }
+
 var game = new Phaser.Game(config);
 var start;
 var txtTitle;
@@ -20,6 +21,7 @@ var keyENTER;
 var sound;
 var score = 0;
 var txtScore = '';
+var tween;
 var nave1 = 5;
 var nave2 = 6;
 var nave3 = 7;

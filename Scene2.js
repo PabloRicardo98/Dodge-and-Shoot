@@ -3,24 +3,22 @@ class Scene2 extends Phaser.Scene {
     super("playGame");
   }
   create() {
-    // position BG
+    // position do BackGround
     this.background = this.add.tileSprite(0, 0, config.width, config.height, "background");
     this.background.setOrigin(0, 0);
     //adicionando fisica e posição das naves e player
-    this.ship1 = this.physics.add.sprite(config.width / 3 - 50, config.height / 2, "ship").setScale(2);
-    this.ship2 = this.physics.add.sprite(config.width / 3, config.height / 2, "ship2").setScale(2);
-    this.ship3 = this.physics.add.sprite(config.width / 3 + 50, config.height / 2, "ship3").setScale(2);
-
-    this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 64, "player").setScale(3);
-
+    this.ship1 = this.physics.add.sprite(config.width / 3 - 50, config.height / 2, "ship").setScale(2.5);
+    this.ship2 = this.physics.add.sprite(config.width / 3, config.height / 2, "ship2").setScale(2.5);
+    this.ship3 = this.physics.add.sprite(config.width / 3 + 50, config.height / 2, "ship3").setScale(2.5);
+    this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 6, "player").setScale(3);
+    //colisão de player com mundo
     this.player.setCollideWorldBounds(true);
-
-
+    //grupo de inimigos
     this.enemies = this.physics.add.group();
     this.enemies.add(this.ship1);
     this.enemies.add(this.ship2);
     this.enemies.add(this.ship3);
-
+    //tiros
     var Bullet = new Phaser.Class({
 
       Extends: Phaser.GameObjects.Image,
@@ -50,7 +48,7 @@ class Scene2 extends Phaser.Scene {
       }
 
     });
-
+    //Fire
     bullets = this.physics.add.group({
       key: 'bullet',
       classType: Bullet,
@@ -85,7 +83,7 @@ class Scene2 extends Phaser.Scene {
     this.anims.create({
       key: "explode",
       frames: this.anims.generateFrameNumbers("explosion"),
-      frameRate: 20,
+      frameRate: 15,
       repeat: 0,
       hideOnComplete: true
     });
@@ -113,18 +111,18 @@ class Scene2 extends Phaser.Scene {
       frameRate: 20,
       repeat: -1
     });
-    //
+    // animção das ship
     this.ship1.play("ship1_anim");
     this.ship2.play("ship2_anim");
     this.ship3.play("ship3_anim");
-    //
+    // animação do player
     this.player.play("thrust");
-    //
+    // make interactive
     this.ship1.setInteractive();
     this.ship2.setInteractive();
     this.ship3.setInteractive();
 
-    this.input.on('gameobjectdown', this.destroyShip, this);
+    //this.input.on('gameobjectdown', this.destroyShip, this);
     // Score inseridona tela
     txtScore = this.add.text(25, 8, "S C O R E  " + score, {
       font: "25px Arial",
@@ -155,25 +153,32 @@ class Scene2 extends Phaser.Scene {
 
       // setVelocity
       powerUp.setVelocity(150, 150);
-      // 3.2
+      // colisão com mundo 
       powerUp.setCollideWorldBounds(true);
       // 3.3
       powerUp.setBounce(1);
     }
-
+    // criação de controles
     cursor = this.input.keyboard.createCursorKeys();
 
-    this.physics.add.overlap(this.player, this.powerUps, this.resetPlayer, null, this);
-    this.physics.add.overlap(this.player, this.enemies, this.resetPlayer, null, this);
-    //destoier enemies
-    this.physics.add.collider(this.enemies, bullets, this.resetShipPos, null, this);
-    //this.physics.add.overlap(bullets, this.enemies, this.destroyShip, null, this);
+    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    //-------------------------------------------
+    //Colisões geral
+    //-------------------------------------------
+    this.physics.add.overlap(bullets, this.powerUps, this.pickpowerUps, null, this);
+    this.physics.add.overlap(this.player, this.powerUps, this.hurtPlayer, null, this);
+    this.physics.add.overlap(this.player, this.enemies, this.hurtPlayer, null, this);
+    this.physics.add.overlap(this.enemies, bullets, this.resetShipPos, null, this);
+    this.physics.add.overlap(bullets, this.enemies, this.hitEnemy, null, this);
     //retornar player na spawn
+    
 
   }
 
 
   update(time) {
+
     this.moveShip(this.ship1, nave1);
     this.moveShip(this.ship2, nave2);
     this.moveShip(this.ship3, nave3);
@@ -181,13 +186,13 @@ class Scene2 extends Phaser.Scene {
       nave1 = nave1 + 0;
       nave2 = nave2 + 0;
       nave3 = nave3 + 0;
-
     }
     this.background.tilePositionY -= 5;
 
     this.movePlayerManeger();
 
-    if (cursor.up.isDown && time > lastFired) {
+    if (Phaser.Input.Keyboard.JustDown(this.spacebar) && time > lastFired) {
+
       var bullet = bullets.get();
 
       if (bullet) {
@@ -196,6 +201,7 @@ class Scene2 extends Phaser.Scene {
         lastFired = time + 50;
       }
     }
+
   }
 
   updateLifeGraph() {
@@ -219,25 +225,70 @@ class Scene2 extends Phaser.Scene {
     } else if (cursor.right.isDown) {
       this.player.setVelocityX(gameSettings.playerSpeed);
     }
-    /* if (cursor.up.isDown) {
-       this.player.setVelocityY(-playerSpeed);
-     } else if (cursor.down.isDown) {
-       this.player.setVelocityY(playerSpeed);
-     }*/
+    if (cursor.up.isDown) {
+      this.player.setVelocityY(-playerSpeed);
+    } else if (cursor.down.isDown) {
+      this.player.setVelocityY(playerSpeed);
+    }  
   }
+
 
   moveShip(ship, speed) {
     ship.y += speed;
     if (ship.y > config.height) {
       this.resetShipPos(ship);
-      
+
     }
   }
 
   resetShipPos(enemies) {
-    enemies.y = 0;
+    var explosion = new Explosion(this, enemies.x, enemies.y);
+    enemies.y = -10;
     var randomX = Phaser.Math.Between(0, config.width);
     enemies.x = randomX;
+  }
+
+  destroyPlayer(player, gameObject) {
+    gameObject.setTexture("explosion");
+    gameObject.play("explode");
+    var x = config.width / 2 - 8;
+    var y = config.height - 64;
+    this.player.enableBody(true, x, y, true, true);
+    endGame = true;
+
+  }
+  resetPlayer() {
+    var x = config.width / 2 - 8;
+    var y = config.height - 200;
+    this.player.enableBody(true, x, y, true, true)
+
+    this.player.alpha = 0.5;
+
+    tween = this.tweens.add({
+      targets: this.player,
+      y: config.height - 200,
+      ease: 'Power1',
+      duration: 1500,
+      repeat:0,
+      onComplete: function(){
+        this.player.alpha = 1;
+      },
+      callbackScope: this
+    });
+    
+  }
+
+  pickpowerUps(player, powerUps) {
+    powerUps.disableBody(true, true)
+    // gameObject.setTexture("explosion");
+    // gameObject.play("explode");
+  }
+
+  hitEnemy(bullets, enemies) {
+    //var explosion = new Explosion(this, enemies.x, enemies.y);
+    bullets.destroy();
+    this.resetShipPos(enemies);
+
     score++;
     txtScore.setText("S C O R E  " + score, {
       font: "25px Arial",
@@ -245,37 +296,23 @@ class Scene2 extends Phaser.Scene {
     });
   }
 
-  destroyShip(pointer, gameObject) {
-    gameObject.setTexture("explosion");
-    gameObject.play("explode");
-    this.resetShipPos();
-  }
-  destroyPlayer(gameObject) {
-    gameObject.setTexture("explosion");
-    gameObject.play("explode");
-    endGame = true;
-  }
-  resetPlayer() {
-    var x = config.width / 2 - 8;
-    var y = config.height - 64;
-    this.player.enableBody(true, x, y, true, true)
-  };
-
-
-  pickpowerUps(player, powerUps) {
-    powerUps.disableBody(true, true)
-    gameObject.setTexture("explosion");
-    gameObject.play("explode");
-  }
-
-  hitEnemy(bullet, enemy) {
-    var explosion = new Explosion(this, enemy.x, enemy.y);
-  }
-
-  /*hurtPlayer(player, enemies) {
+  hurtPlayer(player, enemies) {
     this.resetShipPos(enemies);
-    
+        
+    if(this.player.alpha < 1){
+      return;
+    }
+    var explosion = new Explosion(this, enemies.x, enemies.y);
+    this.resetPlayer();
     player.x = config.width / 2 - 8;
     player.y = config.height - 64;
-  }*/
+    //this reset player
+    
+    this.time.addEvent({
+      delay: 100,
+      callback: this.resetPlayer,
+      callbackScope: this,
+      loop: false
+    });
+  }
 }
